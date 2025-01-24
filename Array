@@ -1,0 +1,61 @@
+import java.util.Scanner;
+
+public class ArrayAddressCalculator {
+    
+    // Method to calculate the linear index
+    public static int calculateLinearIndex(int[] targetElement, int[] upperBounds) {
+        int linearIndex = 0;
+        int product = 1;
+
+        // Traverse dimensions in reverse order to calculate the linear index
+        for (int i = targetElement.length - 1; i >= 0; i--) {
+            linearIndex += targetElement[i] * product;
+            product *= upperBounds[i];
+        }
+        
+        return linearIndex;
+    }
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+
+        // Get the number of dimensions
+        System.out.print("Enter the number of dimensions: ");
+        int numDimensions = scanner.nextInt();
+
+        // Get the base address (Alpha)
+        System.out.print("Enter the base address (Alpha): ");
+        int baseAddress = scanner.nextInt();
+
+        // Get the element size
+        System.out.print("Enter the element size (in bytes): ");
+        int elementSize = scanner.nextInt();
+
+        // Get the upper bounds for each dimension
+        int[] upperBounds = new int[numDimensions];
+        System.out.println("Enter the upper bounds for each dimension (max index): ");
+        for (int i = 0; i < numDimensions; i++) {
+            System.out.print("Upper bound for dimension " + (i + 1) + ": ");
+            upperBounds[i] = scanner.nextInt();
+        }
+
+        // Get the target element's indices
+        int[] targetElement = new int[numDimensions];
+        System.out.println("Enter the target element's index for each dimension: ");
+        for (int i = 0; i < numDimensions; i++) {
+            System.out.print("Index for dimension " + (i + 1) + ": ");
+            targetElement[i] = scanner.nextInt();
+        }
+
+        // Calculate the linear index of the target element
+        int linearIndex = calculateLinearIndex(targetElement, upperBounds);
+
+        // Calculate the address of the target element
+        int targetAddress = baseAddress + (linearIndex * elementSize);
+
+        // Output the result
+        System.out.println("The address of the target element is: " + targetAddress);
+
+        scanner.close();
+    }
+}
