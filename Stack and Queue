@@ -1,0 +1,102 @@
+import java.util.Scanner;
+import java.util.Stack;
+import java.util.Queue;
+import java.util.LinkedList;
+
+public class StackQueueProgram {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+
+        // Ask user if they want to use a stack or a queue
+        System.out.print("Choose data structure (1 for Stack, 2 for Queue): ");
+        int choice = scanner.nextInt();
+
+        if (choice == 1) {
+            // Stack operations
+            stackOperations(scanner);
+        } else if (choice == 2) {
+            // Queue operations
+            queueOperations(scanner);
+        } else {
+            System.out.println("Invalid choice. Exiting program.");
+        }
+
+        scanner.close();
+    }
+
+    // Method to handle stack operations
+    private static void stackOperations(Scanner scanner) {
+        System.out.print("Enter the size of the stack: ");
+        int n = scanner.nextInt();
+        Stack<Integer> stack = new Stack<>();
+
+        while (true) {
+            System.out.print("Choose operation (1 for Push, 2 for Pop, 3 to End): ");
+            int operation = scanner.nextInt();
+
+            if (operation == 1) {
+                // Push operation
+                if (stack.size() < n) {
+                    System.out.print("Enter integer value to push: ");
+                    int value = scanner.nextInt();
+                    stack.push(value);
+                    System.out.println("Pushed: " + value);
+                } else {
+                    System.out.println("Stack is full. Cannot push.");
+                }
+            } else if (operation == 2) {
+                // Pop operation
+                if (!stack.isEmpty()) {
+                    int poppedValue = stack.pop();
+                    System.out.println("Popped: " + poppedValue);
+                } else {
+                    System.out.println("Stack is empty. Cannot pop.");
+                }
+            } else if (operation == 3) {
+                // End and print stack
+                System.out.println("Final stack: " + stack);
+                break;
+            } else {
+                System.out.println("Invalid operation. Try again.");
+            }
+        }
+    }
+
+    // Method to handle queue operations
+    private static void queueOperations(Scanner scanner) {
+        System.out.print("Enter the size of the queue: ");
+        int n = scanner.nextInt();
+        Queue<Integer> queue = new LinkedList<>();
+
+        while (true) {
+            System.out.print("Choose operation (1 for Enqueue, 2 for Dequeue, 3 to End): ");
+            int operation = scanner.nextInt();
+
+            if (operation == 1) {
+                // Enqueue operation
+                if (queue.size() < n) {
+                    System.out.print("Enter integer value to enqueue: ");
+                    int value = scanner.nextInt();
+                    queue.add(value);
+                    System.out.println("Enqueued: " + value);
+                } else {
+                    System.out.println("Queue is full. Cannot enqueue.");
+                }
+            } else if (operation == 2) {
+                // Dequeue operation
+                if (!queue.isEmpty()) {
+                    int dequeuedValue = queue.poll();
+                    System.out.println("Dequeued: " + dequeuedValue);
+                } else {
+                    System.out.println("Queue is empty. Cannot dequeue.");
+                }
+            } else if (operation == 3) {
+                // End and print queue
+                System.out.println("Final queue: " + queue);
+                break;
+            } else {
+                System.out.println("Invalid operation. Try again.");
+            }
+        }
+    }
+}
