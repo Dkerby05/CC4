@@ -1,0 +1,109 @@
+import java.util.ArrayDeque;
+import java.util.Deque;
+import java.util.Scanner;
+
+public class Main {
+
+    // Helper function to determine precedence of operators
+    static int precedence(char operator) {
+        switch (operator) {
+            case '+':
+            case '-':
+                return 1;
+            case '*':
+            case '/':
+                return 2;
+            case '^': // Exponentiation
+                return 3;
+        }
+        return -1; // For operands and parentheses
+    }
+
+    // Function to check if a character is an operand (letter or digit)
+    static boolean isOperand(char ch) {
+        return Character.isLetterOrDigit(ch);
+    }
+
+    // Function to convert infix to prefix
+    static String infixToPrefix(String infix) {
+        StringBuilder result = new StringBuilder();
+        StringBuilder input = new StringBuilder(infix);
+        input.reverse();
+
+        Deque<Character> stack = new ArrayDeque<>();
+
+        for (int i = 0; i < input.length(); i++) {
+            char c = input.charAt(i);
+
+            if (isOperand(c)) {
+                result.append(c);
+            } else if (c == ')') {  // Reversed, so '(' becomes ')'
+                stack.push(c);
+            } else if (c == '(') {  // Reversed, so ')' becomes '('
+                while (!stack.isEmpty() && stack.peek() != ')') {
+                    result.append(stack.pop());
+                }
+                stack.pop(); // Pop the ')'
+            } else {
+                while (!stack.isEmpty() && precedence(c) < precedence(stack.peek())) {
+                    result.append(stack.pop());
+                }
+                stack.push(c);
+            }
+        }
+
+        while (!stack.isEmpty()) {
+            result.append(stack.pop());
+        }
+
+        return result.reverse().toString();
+    }
+
+
+    // Function to convert infix to postfix
+    static String infixToPostfix(String infix) {
+        StringBuilder result = new StringBuilder();
+        Deque<Character> stack = new ArrayDeque<>();
+
+        for (int i = 0; i < infix.length(); i++) {
+            char c = infix.charAt(i);
+
+            if (isOperand(c)) {
+                result.append(c);
+            } else if (c == '(') {
+                stack.push(c);
+            } else if (c == ')') {
+                while (!stack.isEmpty() && stack.peek() != '(') {
+                    result.append(stack.pop());
+                }
+                stack.pop(); // Pop the '('
+            } else { // Operator
+                while (!stack.isEmpty() && precedence(c) <= precedence(stack.peek())) {
+                    result.append(stack.pop());
+                }
+                stack.push(c);
+            }
+        }
+
+        while (!stack.isEmpty()) {
+            result.append(stack.pop());
+        }
+
+        return result.toString();
+    }
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.print("Enter infix: ");
+        String infix = scanner.nextLine();
+
+        String prefix = infixToPrefix(infix);
+        String postfix = infixToPostfix(infix);
+
+        System.out.println("Prefix is: " + prefix);
+        System.out.println("Postfix is: " + postfix);
+
+        scanner.close();
+    }
+}
