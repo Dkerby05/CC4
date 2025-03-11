@@ -1,0 +1,169 @@
+package com.mycompany.eoe;
+
+import java.util.Stack;
+import java.util.Scanner;
+
+public class prefix {
+
+// Function to check if a character is an operator
+private static boolean isOperator(char c) {
+return "+-*/^%".indexOf(c) != -1;
+}
+
+// Function to get precedence
+private static int precedence(char c) {
+if (c == '+' || c == '-') return 1;
+if (c == '*' || c == '/' || c == '%') return 2;
+if (c == '^') return 3; // Exponentiation is right-associative
+return -1;
+}
+
+// Function to check associativity (left or right)
+private static boolean isRightAssociative(char c) {
+return c == '^'; // Only exponentiation is right-associative
+}
+
+// ✅ **Infix to Postfix**
+public static String infixToPostfix(String infix) {
+if (infix == null || infix.isEmpty()) return "Error: Empty expression";
+
+StringBuilder result = new StringBuilder();
+Stack<Character> stack = new Stack<>();
+infix = infix.replaceAll("\\s", ""); // Remove spaces
+
+for (char c : infix.toCharArray()) {
+if (Character.isDigit(c) || Character.isLetter(c)) {
+result.append(c).append(" ");
+} else if (c == '(') {
+stack.push(c);
+} else if (c == ')') {
+while (!stack.isEmpty() && stack.peek() != '(') {
+result.append(stack.pop()).append(" ");
+}
+if (!stack.isEmpty()) stack.pop(); // Pop '('
+} else if (isOperator(c)) {
+while (!stack.isEmpty() && stack.peek() != '(' && precedence(stack.peek()) >= precedence(c)) {
+result.append(stack.pop()).append(" ");
+}
+stack.push(c);
+} else {
+return "Error: Invalid character in expression";
+}
+}
+while (!stack.isEmpty()) {
+if (stack.peek() == '(') return "Error: Unbalanced parentheses";
+result.append(stack.pop()).append(" ");
+}
+return result.toString().trim();
+}
+
+// ✅ **Infix to Prefix**
+public static String infixToPrefix(String infix) {
+if (infix == null || infix.isEmpty()) return "Error: Empty expression";
+
+String reversed = new StringBuilder(infix.replaceAll("\\s", "")).reverse().toString();
+StringBuilder result = new StringBuilder();
+Stack<Character> stack = new Stack<>();
+
+for (char c : reversed.toCharArray()) {
+if (Character.isDigit(c) || Character.isLetter(c)) {
+result.append(c).append(" ");
+} else if (c == ')') {
+stack.push(c);
+} else if (c == '(') {
+while (!stack.isEmpty() && stack.peek() != ')') {
+result.append(stack.pop()).append(" ");
+}
+if (!stack.isEmpty()) stack.pop();
+} else if (isOperator(c)) {
+while (!stack.isEmpty() && precedence(stack.peek()) > precedence(c)) {
+result.append(stack.pop()).append(" ");
+}
+stack.push(c);
+} else {
+return "Error: Invalid character in expression";
+}
+}
+while (!stack.isEmpty()) {
+if (stack.peek() == ')') return "Error: Unbalanced parentheses";
+result.append(stack.pop()).append(" ");
+}
+return result.reverse().toString().trim();
+}
+
+// ✅ **Prefix to Infix** (Restored)
+public static String prefixToInfix(String prefix) {
+if (prefix == null || prefix.isEmpty()) return "Error: Empty expression";
+
+prefix = prefix.replaceAll("\\s", ""); // Remove spaces
+Stack<String> stack = new Stack<>();
+for (int i = prefix.length() - 1; i >= 0; i--) {
+char c = prefix.charAt(i);
+if (Character.isDigit(c) || Character.isLetter(c)) {
+stack.push(Character.toString(c));
+} else if (isOperator(c)) {
+if (stack.size() < 2) return "Error: Malformed Expression";
+String op1 = stack.pop();
+String op2 = stack.pop();
+stack.push("(" + op1 + " " + c + " " + op2 + ")");
+} else {
+return "Error: Invalid character in expression";
+}
+}
+return stack.size() == 1 ? stack.pop() : "Error: Malformed Expression";
+}
+
+// ✅ **Postfix to Infix** (Restored)
+public static String postfixToInfix(String postfix) {
+if (postfix == null || postfix.isEmpty()) return "Error: Empty expression";
+
+postfix = postfix.replaceAll("\\s", ""); // Remove spaces
+Stack<String> stack = new Stack<>();
+for (char c : postfix.toCharArray()) {
+if (Character.isDigit(c) || Character.isLetter(c)) {
+stack.push(Character.toString(c));
+} else if (isOperator(c)) {
+if (stack.size() < 2) return "Error: Malformed Expression";
+String op2 = stack.pop();
+String op1 = stack.pop();
+stack.push("(" + op1 + " " + c + " " + op2 + ")");
+} else {
+return "Error: Invalid character in expression";
+}
+}
+return stack.size() == 1 ? stack.pop() : "Error: Malformed Expression";
+}
+
+public static void main(String[] args) {
+Scanner scanner = new Scanner(System.in);
+boolean run = true;
+while (run) {
+System.out.println("\nChoose conversion type:");
+System.out.println("1. Infix to Prefix & Postfix");
+System.out.println("2. Prefix to Infix");
+System.out.println("3. Postfix to Infix");
+System.out.println("4. Exit");
+System.out.print("Enter choice (1-4): ");
+int choice = scanner.nextInt();
+scanner.nextLine();
+if (choice == 4) break;
+System.out.print("Enter expression: ");
+String expression = scanner.nextLine().trim();
+switch (choice) {
+case 1:
+System.out.println("Prefix: " + infixToPrefix(expression));
+System.out.println("Postfix: " + infixToPostfix(expression));
+break;
+case 2:
+System.out.println("Infix: " + prefixToInfix(expression));
+break;
+case 3:
+System.out.println("Infix: " + postfixToInfix(expression));
+break;
+default:
+System.out.println("Invalid choice. Try again.");
+}
+}
+scanner.close();
+}
+}
