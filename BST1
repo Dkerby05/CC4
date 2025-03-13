@@ -1,0 +1,170 @@
+import java.util.*;
+
+class BST1 {
+    static class Node {
+        int value;
+        Node left, right;
+
+        Node(int value) {
+            this.value = value;
+            left = right = null;
+        }
+    }
+
+    private Node root;
+
+    // Insert multiple values (No duplicates, first number is root)
+    public void insert(int... values) {
+        for (int value : values) {
+            if (value == 0) { // Immediate termination if 0 is entered
+                System.out.println("Zero detected! Program terminating...");
+                System.exit(0);
+            }
+            root = insertRec(root, value);
+        }
+    }
+
+    private Node insertRec(Node node, int value) {
+        if (node == null) return new Node(value);
+
+        if (value < node.value) {
+            node.left = insertRec(node.left, value);
+        } else if (value > node.value) {
+            node.right = insertRec(node.right, value);
+        }
+        return node; // Ignore duplicates
+    }
+
+    // Delete multiple values
+    public void delete(int... values) {
+        for (int value : values) {
+            root = deleteRec(root, value);
+        }
+    }
+
+    private Node deleteRec(Node node, int value) {
+        if (node == null) return node;
+
+        if (value < node.value) {
+            node.left = deleteRec(node.left, value);
+        } else if (value > node.value) {
+            node.right = deleteRec(node.right, value);
+        } else {
+            // Case 1: No child (leaf node)
+            if (node.left == null && node.right == null) {
+                return null;
+            }
+            // Case 2: One child (move child up)
+            else if (node.left == null) {
+                return node.right;
+            } else if (node.right == null) {
+                return node.left;
+            }
+            // Case 3: Two children
+            else {
+                if (node.left != null) {
+                    // Replace with the largest node in the left subtree
+                    Node largestLeft = findLargest(node.left);
+                    node.value = largestLeft.value;
+                    node.left = deleteRec(node.left, largestLeft.value);
+                } else {
+                    // If no left subtree, replace with the leftmost node in the right subtree
+                    Node leftmostRight = findLeftmost(node.right);
+                    node.value = leftmostRight.value;
+                    node.right = deleteRec(node.right, leftmostRight.value);
+                }
+            }
+        }
+        return node;
+    }
+
+    private Node findLargest(Node node) {
+        while (node.right != null) {
+            node = node.right;
+        }
+        return node;
+    }
+
+    private Node findLeftmost(Node node) {
+        while (node.left != null) {
+            node = node.left;
+        }
+        return node;
+    }
+
+    // Convert BST to 1D Array with missing spaces as 0 (Uses 2^k - 1 size)
+    public List<Integer> to1DArray() {
+        int height = getHeight(root);
+        int size = (int) Math.pow(2, height) - 1; // 2^k - 1 formula
+        List<Integer> result = new ArrayList<>(Collections.nCopies(size, 0));
+        levelOrderFill(root, result);
+        return result;
+    }
+
+    private void levelOrderFill(Node node, List<Integer> arr) {
+        if (node == null) return;
+
+        Queue<Node> queue = new LinkedList<>();
+        Queue<Integer> indexQueue = new LinkedList<>();
+        queue.add(node);
+        indexQueue.add(0);
+
+        while (!queue.isEmpty()) {
+            Node curr = queue.poll();
+            int index = indexQueue.poll();
+
+            if (index < arr.size()) {
+                arr.set(index, curr.value);
+
+                if (curr.left != null) {
+                    queue.add(curr.left);
+                    indexQueue.add(2 * index + 1);
+                }
+                if (curr.right != null) {
+                    queue.add(curr.right);
+                    indexQueue.add(2 * index + 2);
+                }
+            }
+        }
+    }
+
+    private int getHeight(Node node) {
+        if (node == null) return 0;
+        return 1 + Math.max(getHeight(node.left), getHeight(node.right));
+    }
+
+    public static void main(String[] args) {
+        BST1 tree = new BST1();
+        Scanner scanner = new Scanner(System.in);
+
+        while (true) {
+            System.out.println("\n1. put in Numbers\n2. Delete Numbers\n3. Print 1D Array\n4. Exit");
+            System.out.print("Choose an option: ");
+            int choice = scanner.nextInt();
+            scanner.nextLine(); // Consume newline
+
+            switch (choice) {
+                case 1:
+                    System.out.print("Enter numbers to insert (space-separated): ");
+                    int[] insertValues = Arrays.stream(scanner.nextLine().split(" "))
+                            .mapToInt(Integer::parseInt).toArray();
+                    tree.insert(insertValues);
+                    break;
+                case 2:
+                    System.out.print("Enter numbers to delete (space-separated): ");
+                    int[] deleteValues = Arrays.stream(scanner.nextLine().split(" "))
+                            .mapToInt(Integer::parseInt).toArray();
+                    tree.delete(deleteValues);
+                    break;
+                case 3:
+                    System.out.println("1D Array Representation: " + tree.to1DArray());
+                    break;
+                case 4:
+                    scanner.close();
+                    return;
+                default:
+                    System.out.println("Invalid choice! Try again.");
+            }
+        }
+    }
+}
